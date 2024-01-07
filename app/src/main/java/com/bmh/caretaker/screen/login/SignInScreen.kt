@@ -82,7 +82,9 @@ fun SignInScreen(
                 ) {
                     Text(text = "Forgot Password", fontSize = 12.sp, color = Color.Gray)
                 }
-                NormalElevatedButton(title = "LOGIN", onClick = {})
+                NormalElevatedButton(title = "LOGIN", onClick = {
+                    viewModel.moveToMain()
+                })
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -99,7 +101,6 @@ fun SignInScreen(
                     color = Color.Blue,
                     fontWeight = FontWeight.Bold)
             }
-
         }
     }
 }

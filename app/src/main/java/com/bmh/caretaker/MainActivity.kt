@@ -8,33 +8,30 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.bmh.caretaker.navigation.LoginNavGraph
-import com.bmh.caretaker.screen.login.LoginViewModel
+import com.bmh.caretaker.navigation.MainNavGraph
 import com.bmh.caretaker.ui.theme.CaretakerTheme
+import com.bmh.caretaker.viewmodel.MainViewModel
 
-class LoginActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
-    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var mainViewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setContent {
             val interactionSource = remember { MutableInteractionSource() }
             val focusManager = LocalFocusManager.current
 
             CaretakerTheme {
-                // A surface container using the 'background' color from the theme
                 navHostController = rememberNavController()
-                loginViewModel.navHostController = navHostController
+                mainViewModel.navController = navHostController
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -42,24 +39,9 @@ class LoginActivity : ComponentActivity() {
                             focusManager.clearFocus()
                         }, color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginNavGraph(loginViewModel = loginViewModel)
+                    MainNavGraph(mainViewModel = mainViewModel)
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!", modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CaretakerTheme {
-        Greeting("Android")
     }
 }
