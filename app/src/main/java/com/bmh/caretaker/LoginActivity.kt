@@ -14,15 +14,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bmh.caretaker.navigation.LoginNavGraph
+import com.bmh.caretaker.screen.login.LoginViewModel
 import com.bmh.caretaker.ui.theme.CaretakerTheme
 
 class MainActivity : ComponentActivity() {
     lateinit var navHostController: NavHostController
+    lateinit var loginViewModel: LoginViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        loginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
         setContent {
             val interactionSource = remember { MutableInteractionSource() }
             val focusManager = LocalFocusManager.current
@@ -30,6 +34,7 @@ class MainActivity : ComponentActivity() {
             CaretakerTheme {
                 // A surface container using the 'background' color from the theme
                 navHostController = rememberNavController()
+                loginViewModel.navHostController = navHostController
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -37,7 +42,7 @@ class MainActivity : ComponentActivity() {
                             focusManager.clearFocus()
                         }, color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginNavGraph(navHostController = navHostController)
+                    LoginNavGraph(loginViewModel)
                 }
             }
         }

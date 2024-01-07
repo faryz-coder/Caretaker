@@ -1,5 +1,6 @@
 package com.bmh.caretaker.screen.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,9 +35,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bmh.caretaker.screen.Screen
 
 @Composable
-fun SignInScreen() {
+fun SignInScreen(
+    viewModel: LoginViewModel
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +72,7 @@ fun SignInScreen() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             NormalTextField(email = email, onValueChange = { email = it })
-            PasswordField(password = password, onValueChange = { password = it })
+            PasswordField(label= "Enter password", password = password, onValueChange = { password = it })
             Column(
                 verticalArrangement = Arrangement.spacedBy(30.dp)
             ) {
@@ -78,7 +82,7 @@ fun SignInScreen() {
                 ) {
                     Text(text = "Forgot Password", fontSize = 12.sp, color = Color.Gray)
                 }
-                NormalElevatedButton(title = "Login", onClick = {})
+                NormalElevatedButton(title = "LOGIN", onClick = {})
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -86,7 +90,14 @@ fun SignInScreen() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(text = "Not yet registered? ", fontSize = 12.sp, color = Color.DarkGray)
-                Text(text = "CLICK HERE.", fontSize = 12.sp, color = Color.Blue, fontWeight = FontWeight.Bold)
+                Text(
+                    modifier= Modifier.clickable {
+                        viewModel.navHostController.navigate(Screen.SignUp.route)
+                    },
+                    text = "CLICK HERE.",
+                    fontSize = 12.sp,
+                    color = Color.Blue,
+                    fontWeight = FontWeight.Bold)
             }
 
         }
@@ -101,7 +112,7 @@ fun NormalElevatedButton(title: String = "", onClick: () -> Unit = {}) {
         onClick = onClick
     ) {
         Text(
-            text = "Login"
+            text = title
         )
     }
 }
@@ -119,7 +130,7 @@ fun NormalTextField(email: String = "", onValueChange: (String) -> Unit = {}) {
 
 @Preview(showBackground = true)
 @Composable
-fun PasswordField(password: String = "", onValueChange: (String) -> Unit = {}) {
+fun PasswordField(label: String = "", password: String = "", onValueChange: (String) -> Unit = {}) {
     var passwordHidden by rememberSaveable {
         mutableStateOf(true)
     }
@@ -128,7 +139,7 @@ fun PasswordField(password: String = "", onValueChange: (String) -> Unit = {}) {
         value = password,
         onValueChange = onValueChange,
         singleLine = true,
-        label = { Text(text = "Enter password") },
+        label = { Text(text = label) },
         visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
@@ -146,5 +157,5 @@ fun PasswordField(password: String = "", onValueChange: (String) -> Unit = {}) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignIn() {
-    SignInScreen()
+    SignInScreen(LoginViewModel())
 }

@@ -5,17 +5,24 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bmh.caretaker.screen.Screen
+import com.bmh.caretaker.screen.login.LoginViewModel
 import com.bmh.caretaker.screen.login.SignInScreen
+import com.bmh.caretaker.screen.login.SignUpScreen
 
 @Composable
 fun LoginNavGraph(
-    navHostController: NavHostController
+    loginViewModel: LoginViewModel
 ) {
-    NavHost(navController = navHostController, startDestination = Screen.SignIn.route) {
+    NavHost(navController = loginViewModel.navHostController, startDestination = Screen.SignIn.route) {
         composable(
             route = Screen.SignIn.route
         ) {
-            SignInScreen()
+            SignInScreen(loginViewModel)
+        }
+        composable(
+            route = Screen.SignUp.route
+        ) {
+            SignUpScreen(loginViewModel)
         }
     }
 }
