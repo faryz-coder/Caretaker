@@ -49,13 +49,18 @@ fun HomeScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        onClick = {},
+                        onClick = {
+                            viewModel.navController.navigate(Screen.PatientInformationScreen.route)
+                        },
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(id = R.drawable.patient_info), contentDescription = "")
+                            Image(
+                                painter = painterResource(id = R.drawable.patient_info),
+                                contentDescription = ""
+                            )
 //                            Text(text = "Patient Information", textAlign = TextAlign.Center)
                         }
                     }
@@ -63,13 +68,16 @@ fun HomeScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        onClick = {viewModel.navController.navigate(Screen.DailyMonitoring.route)},
+                        onClick = { viewModel.navController.navigate(Screen.DailyMonitoring.route) },
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(id = R.drawable.daily_monitoring), contentDescription = "")
+                            Image(
+                                painter = painterResource(id = R.drawable.daily_monitoring),
+                                contentDescription = ""
+                            )
 //                            Text(text = "Daily Monitoring")
                         }
                     }
@@ -83,7 +91,10 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(id = R.drawable.reminder), contentDescription = "")
+                            Image(
+                                painter = painterResource(id = R.drawable.reminder),
+                                contentDescription = ""
+                            )
 //                            Text(text = "Reminder", textAlign = TextAlign.Center)
                         }
                     }
@@ -102,7 +113,10 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(id = R.drawable.medical_notes), contentDescription = "")
+                            Image(
+                                painter = painterResource(id = R.drawable.medical_notes),
+                                contentDescription = ""
+                            )
 //                            Text(text = "Medical Notes", textAlign = TextAlign.Center)
                         }
                     }
@@ -116,7 +130,10 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(id = R.drawable.diet), contentDescription = "")
+                            Image(
+                                painter = painterResource(id = R.drawable.diet),
+                                contentDescription = ""
+                            )
 //                            Text(text = "Diet Guides", textAlign = TextAlign.Center)
                         }
                     }
@@ -130,7 +147,10 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(id = R.drawable.guide), contentDescription = "")
+                            Image(
+                                painter = painterResource(id = R.drawable.guide),
+                                contentDescription = ""
+                            )
 //                            Text(text = "Guide & Tips", textAlign = TextAlign.Center)
                         }
                     }
