@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
 fun MainBody(mainViewModel: MainViewModel) {
     val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
@@ -182,7 +182,7 @@ fun DrawerContent() {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                for (i in 0..4) ElevatedCard(
+                ElevatedCard(
                     onClick = {}
                 ) {
                     Box(
@@ -191,7 +191,67 @@ fun DrawerContent() {
                             .height(50.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("box 1")
+                        Text("Patient Information")
+                    }
+                }
+                ElevatedCard(
+                    onClick = {}
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Daily Monitoring")
+                    }
+                }
+                ElevatedCard(
+                    onClick = {}
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Reminder")
+                    }
+                }
+                ElevatedCard(
+                    onClick = {}
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Medical Notes")
+                    }
+                }
+                ElevatedCard(
+                    onClick = {}
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Diet Guides")
+                    }
+                }
+                ElevatedCard(
+                    onClick = {}
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Guide & Tips")
                     }
                 }
             }
