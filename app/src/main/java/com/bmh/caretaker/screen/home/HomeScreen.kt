@@ -107,7 +107,9 @@ fun HomeScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight(),
-                        onClick = {},
+                        onClick = {
+                                  viewModel.navController.navigate(Screen.MedicalNotesScreen.route)
+                        },
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
