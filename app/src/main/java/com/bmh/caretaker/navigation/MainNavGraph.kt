@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bmh.caretaker.screen.Screen
+import com.bmh.caretaker.screen.daily_monitoring.AddPatientInfoScreen
 import com.bmh.caretaker.screen.daily_monitoring.DailyMonitoringScreen
 import com.bmh.caretaker.screen.home.HomeScreen
 import com.bmh.caretaker.screen.patient_info.PatientInformationScreen
@@ -28,6 +29,11 @@ fun MainNavGraph(
             route = Screen.PatientInformationScreen.route
         ) {
             PatientInformationScreen(mainViewModel)
+        }
+        composable(
+            route = Screen.AddPatientInfoScreen.route
+        ) {
+            AddPatientInfoScreen(mainViewModel)
         }
     }
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.R
+import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
@@ -75,7 +76,9 @@ fun DailyMonitoringScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = {
+                viewModel.navController.navigate(Screen.AddPatientInfoScreen.route)
+            }) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -161,7 +164,8 @@ fun CurrentStateCardTwo(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
-                            .padding(10.dp)
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(text = progress1)
                     }
@@ -170,7 +174,8 @@ fun CurrentStateCardTwo(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
-                            .padding(10.dp)
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(text = progress2)
                     }
