@@ -15,43 +15,51 @@ import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
 fun MainNavGraph(
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    isHome: (Boolean) -> Unit
 ) {
     NavHost(navController = mainViewModel.navController, startDestination = Screen.Home.route) {
         composable(
             route = Screen.Home.route
         ) {
             HomeScreen(mainViewModel)
+            isHome.invoke(true)
         }
         composable(
             route = Screen.DailyMonitoring.route
         ) {
             DailyMonitoringScreen(mainViewModel)
+            isHome.invoke(false)
         }
         composable(
             route = Screen.PatientInformationScreen.route
         ) {
             PatientInformationScreen(mainViewModel)
+            isHome.invoke(false)
         }
         composable(
             route = Screen.AddPatientInfoScreen.route
         ) {
             AddPatientInfoScreen(mainViewModel)
+            isHome.invoke(false)
         }
         composable(
             route = Screen.MedicalNotesScreen.route
         ) {
             MedicalNotesScreen(mainViewModel)
+            isHome.invoke(false)
         }
         composable(
             route = Screen.AddMedicalNotesScreen.route
         ) {
             AddMedicalNotesScreen(mainViewModel)
+            isHome.invoke(false)
         }
         composable(
             route = Screen.ReminderScreen.route
         ) {
             ReminderScreen(mainViewModel)
+            isHome.invoke(false)
         }
     }
 }

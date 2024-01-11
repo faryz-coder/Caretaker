@@ -1,6 +1,7 @@
 package com.bmh.caretaker
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.MoreVert
@@ -35,11 +37,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,6 +55,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bmh.caretaker.navigation.MainNavGraph
+import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.ui.theme.CaretakerTheme
 import com.bmh.caretaker.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
@@ -78,6 +85,10 @@ fun MainBody(mainViewModel: MainViewModel) {
     val focusManager = LocalFocusManager.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    var isHome by remember {
+        mutableStateOf(true)
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -100,18 +111,30 @@ fun MainBody(mainViewModel: MainViewModel) {
                         Text("Caretaker")
                     },
                     navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.apply {
-                                    if (isClosed) open() else close()
+                        if (isHome)
+                            IconButton(onClick = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
                                 }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Menu,
+                                    contentDescription = "Localized description"
+                                )
                             }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Rounded.Menu,
-                                contentDescription = "Localized description"
-                            )
-                        }
+                        else
+                            IconButton(onClick = {
+                                scope.launch {
+                                    mainViewModel.navController.popBackStack()
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.ArrowBackIosNew,
+                                    contentDescription = "Back Button"
+                                )
+                            }
                     },
                     actions = {
                         IconButton(onClick = { /* do something */ }) {
@@ -132,7 +155,7 @@ fun MainBody(mainViewModel: MainViewModel) {
                         focusManager.clearFocus()
                     }, color = MaterialTheme.colorScheme.background
             ) {
-                MainNavGraph(mainViewModel = mainViewModel)
+                MainNavGraph(mainViewModel = mainViewModel) { isHome = it }
             }
         }
     }
