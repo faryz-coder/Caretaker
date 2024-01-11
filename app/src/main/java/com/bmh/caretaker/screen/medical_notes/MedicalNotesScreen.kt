@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bmh.caretaker.model.Notes
+import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
@@ -78,7 +79,9 @@ fun MedicalNotesScreen(
             Button(onClick = { /*TODO*/ }) {
                 Text(text = "Delete")
             }
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = {
+                viewModel.navController.navigate(Screen.AddMedicalNotesScreen.route)
+            }) {
                 Text(text = "Add Notes")
             }
         }

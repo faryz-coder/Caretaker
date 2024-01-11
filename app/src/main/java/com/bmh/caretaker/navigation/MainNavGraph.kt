@@ -7,6 +7,8 @@ import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.screen.daily_monitoring.AddPatientInfoScreen
 import com.bmh.caretaker.screen.daily_monitoring.DailyMonitoringScreen
 import com.bmh.caretaker.screen.home.HomeScreen
+import com.bmh.caretaker.screen.medical_notes.AddMedicalNotesScreen
+import com.bmh.caretaker.screen.medical_notes.MedicalNotesScreen
 import com.bmh.caretaker.screen.patient_info.PatientInformationScreen
 import com.bmh.caretaker.viewmodel.MainViewModel
 
@@ -34,6 +36,16 @@ fun MainNavGraph(
             route = Screen.AddPatientInfoScreen.route
         ) {
             AddPatientInfoScreen(mainViewModel)
+        }
+        composable(
+            route = Screen.MedicalNotesScreen.route
+        ) {
+            MedicalNotesScreen(mainViewModel)
+        }
+        composable(
+            route = Screen.AddMedicalNotesScreen.route
+        ) {
+            AddMedicalNotesScreen(mainViewModel)
         }
     }
 }
