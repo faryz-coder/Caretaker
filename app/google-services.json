@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348087474983",
+    "project_id": "caretaker-d6cda",
+    "storage_bucket": "caretaker-d6cda.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348087474983:android:27fb1f493cfed652a26702",
+        "android_client_info": {
+          "package_name": "com.bmh.caretaker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZaUezgna1M4GZs7vb_BnfqISada6hXCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
