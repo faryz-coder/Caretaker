@@ -1,5 +1,7 @@
 package com.bmh.caretaker
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.bmh.caretaker.navigation.LoginNavGraph
 import com.bmh.caretaker.screen.login.LoginViewModel
 import com.bmh.caretaker.ui.theme.CaretakerTheme
+import com.bmh.caretaker.utils.AuthManager
 
 class LoginActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
@@ -46,6 +49,18 @@ class LoginActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        AuthManager().isCurrentUser(
+            onSuccess = {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            },
+            onFailed = {}
+        )
     }
 }
 

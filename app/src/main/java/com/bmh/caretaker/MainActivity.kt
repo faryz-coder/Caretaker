@@ -1,7 +1,6 @@
 package com.bmh.caretaker
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.border
@@ -45,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +53,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bmh.caretaker.navigation.MainNavGraph
-import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.ui.theme.CaretakerTheme
 import com.bmh.caretaker.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
@@ -85,7 +82,6 @@ fun MainBody(mainViewModel: MainViewModel) {
     val focusManager = LocalFocusManager.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     var isHome by remember {
         mutableStateOf(true)
     }
