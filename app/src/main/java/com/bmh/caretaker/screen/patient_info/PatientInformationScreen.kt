@@ -3,6 +3,7 @@ package com.bmh.caretaker.screen.patient_info
 import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -18,10 +19,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -36,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -80,7 +87,7 @@ fun PatientInformationScreen(
                     modifier = Modifier.size(150.dp)
                 ) {
 
-                    if (updateImg!=null) Image(
+                    if (updateImg != null) Image(
                         painter = painter,
                         contentDescription = "",
                         contentScale = ContentScale.FillWidth,
@@ -89,7 +96,8 @@ fun PatientInformationScreen(
                     else Icon(
                         Icons.Filled.AddAPhoto,
                         contentDescription = "",
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(20.dp),
                     )
                 }
@@ -107,7 +115,12 @@ fun PatientInformationScreen(
         var birthDate by rememberSaveable {
             mutableStateOf("")
         }
-
+        var cancerType by rememberSaveable {
+            mutableStateOf("")
+        }
+        var cancerStage by rememberSaveable {
+            mutableStateOf("")
+        }
 
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -116,21 +129,37 @@ fun PatientInformationScreen(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                SmallTextField(label = "Age", value = age, onValueChange = { age = it })
-                SmallTextField(label = "Gender", value = gender, onValueChange = { gender = it })
+                SmallTextField(
+                    label = "Age",
+                    value = age,
+                    isNumber = true,
+                    onValueChange = { age = it })
+                GenderDropdown { gender = it }
             }
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { selectDate(context) { birthDate = it }.show()  }) {
+                onClick = { selectDate(context) { birthDate = it }.show() }) {
                 Text(text = "Birth Date $birthDate")
             }
-            WideTextField(label = "Cancer Type", value = "", onValueChange = { })
-            WideTextField(label = "Cancer Stage", value = "", onValueChange = { })
+            WideTextField(
+                label = "Cancer Type",
+                value = cancerType,
+                onValueChange = { cancerType = it })
+            WideTextField(
+                label = "Cancer Stage",
+                value = cancerStage,
+                onValueChange = { cancerStage = it })
         }
 
         Button(
             modifier = Modifier.fillMaxWidth(0.5f),
-            onClick = { viewModel.navController.popBackStack() }) {
+            onClick = {
+                viewModel.navController.popBackStack()
+                Log.d(
+                    "PatientInfo",
+                    "name: $name, age: $age, gender: $gender, dob: $birthDate, ctype: $cancerType, cStage: $cancerStage"
+                )
+            }) {
             Text(text = "Save")
         }
     }
@@ -172,10 +201,53 @@ fun ReadOnlyTextField(label: String, value: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun SmallTextField(label: String, value: String, onValueChange: (String) -> Unit) {
+fun SmallTextField(
+    label: String,
+    value: String,
+    isNumber: Boolean = false,
+    onValueChange: (String) -> Unit
+) {
     TextField(
         modifier = Modifier.width(100.dp),
-        value = value, onValueChange = onValueChange, label = { Text(text = label) })
+        value = value, onValueChange = onValueChange, label = { Text(text = label) },
+        keyboardOptions = if (isNumber) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions(
+            keyboardType = KeyboardType.Text
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GenderDropdown(onSelect: (String) -> Unit) {
+    val options = listOf("Male", "Female")
+    var selectedOptionText by remember { mutableStateOf(options[0]) }
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+        TextField(
+            // The `menuAnchor` modifier must be passed to the text field for correctness.
+            modifier = Modifier.menuAnchor(),
+            readOnly = true,
+            value = selectedOptionText,
+            onValueChange = {},
+            label = { Text("Gender") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(text = selectionOption) },
+                    onClick = {
+                        selectedOptionText = selectionOption
+                        onSelect.invoke(selectionOption)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
