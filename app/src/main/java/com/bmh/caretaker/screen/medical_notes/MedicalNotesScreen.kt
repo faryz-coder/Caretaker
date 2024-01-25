@@ -1,5 +1,6 @@
 package com.bmh.caretaker.screen.medical_notes
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,29 +13,39 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bmh.caretaker.model.Notes
 import com.bmh.caretaker.screen.Screen
+import com.bmh.caretaker.utils.Utils
+import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
 fun MedicalNotesScreen(
     viewModel: MainViewModel
 ) {
-    val notes = mutableListOf<Notes>()
-
-    for (i in 0..3) {
-        notes.add(
-            Notes(
-                "$i",
-                "Title $i",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                "0$i February 2024"
-            )
+    val context = LocalContext.current
+    val notes: MutableList<Notes> = remember {
+        mutableListOf()
+    }
+    try {
+        FirestoreManager().getNotes(
+            onSuccess = {
+                notes.clear()
+                notes.addAll(it)
+            },
+            onFailed = {
+                Utils().showToast(context, "Failed to get notes")
+            }
         )
+    } catch (e: Exception) {
+        Log.e("MedicalNotesScreen", "Failed connecting to db: Error: $e")
+        Utils().showToast(context, "Failed connecting to db")
     }
 
     Column(

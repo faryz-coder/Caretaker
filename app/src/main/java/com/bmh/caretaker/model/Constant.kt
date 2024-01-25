@@ -21,7 +21,7 @@ object Constant {
     const val ID = "id"
     const val TITLE = "title"
     const val CONTENT = "content"
-    const val DATE = "DATE"
+    const val DATE = "date"
 
     // Reminder
     const val TIME = "time"
