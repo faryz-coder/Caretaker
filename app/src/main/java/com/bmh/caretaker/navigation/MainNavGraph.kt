@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.screen.daily_monitoring.AddPatientInfoScreen
 import com.bmh.caretaker.screen.daily_monitoring.DailyMonitoringScreen
+import com.bmh.caretaker.screen.diet_guides.DietGuidesScreen
+import com.bmh.caretaker.screen.guide_and_tips.GuideAndTipsScreen
 import com.bmh.caretaker.screen.home.HomeScreen
 import com.bmh.caretaker.screen.medical_notes.AddMedicalNotesScreen
 import com.bmh.caretaker.screen.medical_notes.MedicalNotesScreen
@@ -59,6 +61,18 @@ fun MainNavGraph(
             route = Screen.ReminderScreen.route
         ) {
             ReminderScreen(mainViewModel)
+            isHome.invoke(false)
+        }
+        composable(
+            route = Screen.DietGuideScreen.route
+        ) {
+            DietGuidesScreen(mainViewModel)
+            isHome.invoke(false)
+        }
+        composable(
+            route = Screen.GuideAndTipsScreen.route
+        ) {
+            GuideAndTipsScreen(mainViewModel)
             isHome.invoke(false)
         }
     }
