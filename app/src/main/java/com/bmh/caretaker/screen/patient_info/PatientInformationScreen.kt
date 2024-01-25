@@ -2,9 +2,12 @@ package com.bmh.caretaker.screen.patient_info
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,12 +43,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.bmh.caretaker.model.PatientInfo
+import com.bmh.caretaker.utils.Utils
+import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 import java.util.Calendar
 
@@ -66,6 +75,53 @@ fun PatientInformationScreen(
             updateImg = it
         }
     )
+
+    var name by rememberSaveable {
+        mutableStateOf("")
+    }
+    var age by rememberSaveable {
+        mutableStateOf("")
+    }
+    var gender by rememberSaveable {
+        mutableStateOf("Male")
+    }
+    var birthDate by rememberSaveable {
+        mutableStateOf("")
+    }
+    var cancerType by rememberSaveable {
+        mutableStateOf("")
+    }
+    var cancerStage by rememberSaveable {
+        mutableStateOf("")
+    }
+    var base64Image: ByteArray? = null
+    var bitmap: Bitmap? by rememberSaveable {
+        mutableStateOf(null)
+    }
+
+    try {
+        FirestoreManager().getPatientInfo(
+            onSuccess = {
+                name = it.name
+                age = it.age
+                gender = it.gender
+                birthDate = it.dateOfBirth
+                cancerType = it.cancerType
+                cancerStage = it.cancerStage
+                base64Image = Utils().imageFromBase64(it.image)
+
+                bitmap = base64Image?.let { byteArray ->
+                    BitmapFactory.decodeByteArray(
+                        base64Image,
+                        0,
+                        byteArray.size
+                    )
+                }
+            },
+            onFailed = {}
+        )
+    } catch (_: Exception) {
+    }
 
 
     Column(
@@ -92,6 +148,11 @@ fun PatientInformationScreen(
                         contentDescription = "",
                         contentScale = ContentScale.FillWidth,
                         modifier = Modifier.fillMaxSize(),
+                    ) else if (bitmap != null) Image(
+                        bitmap = bitmap!!.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier.fillMaxSize(),
                     )
                     else Icon(
                         Icons.Filled.AddAPhoto,
@@ -102,24 +163,6 @@ fun PatientInformationScreen(
                     )
                 }
             }
-        }
-        var name by rememberSaveable {
-            mutableStateOf("")
-        }
-        var age by rememberSaveable {
-            mutableStateOf("")
-        }
-        var gender by rememberSaveable {
-            mutableStateOf("Male")
-        }
-        var birthDate by rememberSaveable {
-            mutableStateOf("")
-        }
-        var cancerType by rememberSaveable {
-            mutableStateOf("")
-        }
-        var cancerStage by rememberSaveable {
-            mutableStateOf("")
         }
 
         Column(
@@ -154,13 +197,47 @@ fun PatientInformationScreen(
         Button(
             modifier = Modifier.fillMaxWidth(0.5f),
             onClick = {
-                viewModel.navController.popBackStack()
+//                viewModel.navController.popBackStack()
                 Log.d(
                     "PatientInfo",
                     "name: $name, age: $age, gender: $gender, dob: $birthDate, ctype: $cancerType, cStage: $cancerStage"
                 )
+                initiatePatientInfoUpdate(
+                    context, name, age, gender, birthDate, cancerType, cancerStage, updateImg
+                )
+
             }) {
             Text(text = "Save")
+        }
+    }
+}
+
+fun initiatePatientInfoUpdate(
+    context: Context,
+    name: String,
+    age: String,
+    gender: String,
+    birthDate: String,
+    cancerType: String,
+    cancerStage: String,
+    updateImg: Uri?
+) {
+    if (name.isNotEmpty() && age.isNotEmpty() && gender.isNotEmpty() && birthDate.isNotEmpty() && cancerType.isNotEmpty()
+        && cancerStage.isNotEmpty() && updateImg != null
+    ) {
+        val stringBase64 = Utils().convertImageToBase64(context, updateImg) ?: ""
+        PatientInfo(
+            name, age, gender, birthDate, cancerType, cancerStage, stringBase64
+        ).let {
+            try {
+                FirestoreManager().uploadPatientInfo(
+                    patientInfo = it,
+                    onSuccess = { Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show() },
+                    onFailed = {}
+                )
+            } catch (e: Exception) {
+                Log.e("PatientInfo", "initiatePatientInfoUpdate:Error:$e")
+            }
         }
     }
 }

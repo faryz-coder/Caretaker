@@ -1,22 +1,22 @@
 package com.bmh.caretaker.utils
 
+import android.content.Context
+import android.net.Uri
 import android.util.Base64
-import java.io.File
-import java.io.FileInputStream
 
 class Utils {
-    fun convertImageToBase64(imagePath: String): String? {
+    fun convertImageToBase64(context: Context, imagePath: Uri): String? {
         return try {
-            val file = File(imagePath)
-            val inputStream = FileInputStream(file)
-            val buffer = ByteArray(inputStream.available())
-            inputStream.read()
-            inputStream.close()
-
-            Base64.encodeToString(buffer, Base64.DEFAULT)
+           context.contentResolver.openInputStream(imagePath)?.readBytes().let { bytes ->
+               Base64.encodeToString(bytes, Base64.DEFAULT)
+           }
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
+    }
+
+    fun imageFromBase64(base64String: String): ByteArray? {
+        return Base64.decode(base64String, Base64.DEFAULT)
     }
 }
