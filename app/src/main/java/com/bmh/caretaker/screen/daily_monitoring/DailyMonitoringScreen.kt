@@ -1,5 +1,7 @@
 package com.bmh.caretaker.screen.daily_monitoring
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,21 +27,82 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.R
 import com.bmh.caretaker.screen.Screen
+import com.bmh.caretaker.utils.Utils
+import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
 fun DailyMonitoringScreen(
     viewModel: MainViewModel
 ) {
+    val context = LocalContext.current
+    var heartBeatProgress by remember {
+        mutableStateOf("90")
+    }
+    var sysProgress by remember {
+        mutableStateOf("90")
+    }
+    var diaProgress by remember {
+        mutableStateOf("90")
+    }
+    var oxygenLevelProgress by remember {
+        mutableStateOf("96")
+    }
+    var patientName by remember {
+        mutableStateOf("Patients Name")
+    }
+    var base64Image: ByteArray? = null
+    var bitmap: Bitmap? by rememberSaveable {
+        mutableStateOf(null)
+    }
+
+    try {
+        FirestoreManager().getPatientInfo(
+            onSuccess = {
+                patientName = it.name
+                base64Image = Utils().imageFromBase64(it.image)
+                bitmap = base64Image?.let { byteArray ->
+                    BitmapFactory.decodeByteArray(
+                        base64Image,
+                        0,
+                        byteArray.size
+                    )
+                }
+            },
+            onFailed = {
+                Utils().showToast(context, "Failed retrieving patient info")
+            }
+        )
+
+        FirestoreManager().getListOfPatientMonitoring(
+            onSuccess = {
+                val info = it.first()
+                heartBeatProgress = info.heartRate
+                sysProgress = info.bloodSys
+                diaProgress = info.bloodDia
+                oxygenLevelProgress = info.oxygenLevel
+            },
+            onFailed = {
+                Utils().showToast(context, "Failed retrieving data")
+            }
+        )
+    } catch (e: Exception) {
+        Utils().showToast(context, "Failed to connect to db")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,9 +117,14 @@ fun DailyMonitoringScreen(
                 Box(
                     modifier = Modifier.size(150.dp)
                 ) {
-                    Icon(
+                    if (bitmap == null) Icon(
                         Icons.Filled.PersonOutline,
                         contentDescription = "",
+                        modifier = Modifier.fillMaxSize(),
+                    ) else Image(
+                        bitmap = bitmap!!.asImageBitmap(),
+                        contentDescription = "",
+                        contentScale = ContentScale.FillWidth,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -68,7 +136,7 @@ fun DailyMonitoringScreen(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Patients Name")
+            Text(text = patientName)
         }
 
         // Add New
@@ -90,9 +158,6 @@ fun DailyMonitoringScreen(
         }
 
         Text(text = "Current State")
-        var heartBeatProgress by remember {
-            mutableStateOf("90")
-        }
 
         CurrentStateCardOne(
             label = "Heart Rate",
@@ -100,13 +165,6 @@ fun DailyMonitoringScreen(
             progress = heartBeatProgress,
             type = "BPM"
         )
-
-        var sysProgress by remember {
-            mutableStateOf("90")
-        }
-        var diaProgress by remember {
-            mutableStateOf("90")
-        }
 
         CurrentStateCardTwo(
             label = "Blood Pressure",
@@ -117,9 +175,7 @@ fun DailyMonitoringScreen(
             type2 = "DIA"
         )
 
-        var oxygenLevelProgress by remember {
-            mutableStateOf("96")
-        }
+
         // Oxygen Level
         CurrentStateCardOne(
             label = "Oxygen Level",

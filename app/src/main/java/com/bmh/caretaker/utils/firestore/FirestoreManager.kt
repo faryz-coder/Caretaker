@@ -29,6 +29,7 @@ import com.bmh.caretaker.model.PatientMonitor
 import com.bmh.caretaker.model.Reminder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.getField
@@ -107,7 +108,7 @@ class FirestoreManager {
         onFailed: () -> Unit
     ) {
         db.collection(USERS).document(auth.currentUser?.email.toString()).collection(PATIENTS)
-            .document("0").collection(MONITORING)
+            .document("0").collection(MONITORING).orderBy(DATE_TIME, Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
                 val list = mutableListOf<PatientMonitor>()

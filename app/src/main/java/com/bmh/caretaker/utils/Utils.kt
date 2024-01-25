@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Base64
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -39,5 +41,12 @@ class Utils {
         val currentDateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
         return currentDateTime.format(formatter)
+    }
+
+    /**
+     * Show toast message
+     */
+    fun showToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }
