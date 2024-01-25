@@ -1,8 +1,9 @@
 package com.bmh.caretaker.model
 
 data class Reminder (
-    val id: String = "",
-    val time: String = "",
+    var id: String = "",
+    val hour: Int = 0,
+    val minute: Int = 0,
     val label: String = "",
-    val checked: Boolean = false
+    var checked: Boolean = false
 )

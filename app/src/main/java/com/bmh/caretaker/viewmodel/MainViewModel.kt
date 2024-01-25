@@ -2,7 +2,9 @@ package com.bmh.caretaker.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.bmh.caretaker.utils.SharedPreferenceManager
 
 class MainViewModel: ViewModel() {
     lateinit var navController: NavHostController
+    lateinit var sharedPreferenceManager: SharedPreferenceManager
 }

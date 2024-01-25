@@ -1,5 +1,6 @@
 package com.bmh.caretaker.screen.reminder
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNotifications
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
@@ -28,6 +28,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,10 +56,15 @@ fun ReminderScreen(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
 
-        val reminders = mutableListOf<Reminder>()
+        val reminders: MutableList<Reminder> = remember { mutableStateListOf() }
 
-        for (i in 0..2) {
-            reminders.add(Reminder("$i", "0$i:00", "Label content", true))
+        try {
+            viewModel.sharedPreferenceManager.getListReminder().let {
+                reminders.clear()
+                reminders.addAll(it)
+            }
+
+        } catch (e: Exception) {
         }
 
         LazyColumn(
@@ -68,7 +74,10 @@ fun ReminderScreen(
             items(
                 reminders
             ) { item ->
-                ReminderBox()
+                ReminderBox(item,
+                    onChange = {
+                        viewModel.sharedPreferenceManager.updateReminderStatus(item, it)
+                    })
             }
         }
         ElevatedButton(
@@ -80,6 +89,7 @@ fun ReminderScreen(
         }
         if (addAlertDialog.value) {
             DialogAddReminder(
+                viewModel,
                 onDismissRequest = {
                     addAlertDialog.value = false
                 },
@@ -93,6 +103,7 @@ fun ReminderScreen(
 @Preview(showBackground = true)
 @Composable
 fun DialogAddReminder(
+    viewModel: MainViewModel = MainViewModel(),
     onDismissRequest: () -> Unit = {},
     onConfirmation: (String, String) -> Unit = { _, _ -> },
 ) {
@@ -120,12 +131,21 @@ fun DialogAddReminder(
                 cal.set(Calendar.HOUR_OF_DAY, state.hour)
                 cal.set(Calendar.MINUTE, state.minute)
                 cal.isLenient = false
+                Log.d("ReminderScreen", "$cal")
+                viewModel.sharedPreferenceManager.addReminderInto(
+                    Reminder(
+                        hour = state.hour,
+                        minute = state.minute,
+                        label = label
+                    )
+                )
+                onDismissRequest.invoke()
             }) {
                 Text(text = "Confirm")
             }
         },
         dismissButton = {
-            TextButton(onClick = { }) {
+            TextButton(onClick = onDismissRequest) {
                 Text(text = "Dismiss")
             }
         }
@@ -134,7 +154,10 @@ fun DialogAddReminder(
 
 @Preview(showBackground = true)
 @Composable
-fun ReminderBox(reminder: Reminder = Reminder()) {
+fun ReminderBox(reminder: Reminder = Reminder(), onChange: (Boolean) -> Unit = {}) {
+    var currentState by remember {
+        mutableStateOf(reminder.checked)
+    }
     ElevatedCard(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -155,7 +178,9 @@ fun ReminderBox(reminder: Reminder = Reminder()) {
                             modifier = Modifier.fillMaxWidth(0.5f),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = reminder.time)
+                            Text(
+                                text = "${reminder.hour}:${if (reminder.minute < 10) 0 else ""}${reminder.minute}"
+                            )
                         }
 
                         Box(
@@ -177,7 +202,10 @@ fun ReminderBox(reminder: Reminder = Reminder()) {
                         value = reminder.label, onValueChange = {}, readOnly = true,
                         label = { Text(text = "Label") }
                     )
-                    Switch(checked = reminder.checked, onCheckedChange = {})
+                    Switch(checked = currentState, onCheckedChange = {
+                        currentState = it
+                        onChange.invoke(it)
+                    })
                 }
             }
         }

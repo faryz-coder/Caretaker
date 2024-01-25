@@ -208,7 +208,7 @@ class FirestoreManager {
                     reminder.add(
                         Reminder(
                             id = it.id,
-                            time = it.getField<String>(TIME) ?: "",
+                            hour = it.getField<String>(TIME)?.toInt() ?: 0,
                             label = it.getField<String>(LABEL) ?: "",
                         )
                     )
