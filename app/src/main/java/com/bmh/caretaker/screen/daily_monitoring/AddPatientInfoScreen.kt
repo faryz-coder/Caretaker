@@ -1,5 +1,7 @@
 package com.bmh.caretaker.screen.daily_monitoring
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,19 +25,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.R
-import com.bmh.caretaker.model.Daily
-import com.bmh.caretaker.screen.Screen
+import com.bmh.caretaker.model.PatientMonitor
+import com.bmh.caretaker.utils.Utils
+import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
 fun AddPatientInfoScreen(
     viewModel: MainViewModel
 ) {
+    val context = LocalContext.current
     var heartRate by remember { mutableStateOf("") }
     var bloodSys by remember { mutableStateOf("") }
     var bloodDia by remember { mutableStateOf("") }
@@ -103,9 +108,45 @@ fun AddPatientInfoScreen(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                viewModel.navController.popBackStack()
+                initiateAddingPatientStatus(
+                    context,
+                    heartRate, bloodSys, bloodDia, oxygenLevel,
+                    onSuccess = {
+                        viewModel.navController.popBackStack()
+                    }
+                )
             }) {
             Text(text = "Save")
+        }
+    }
+}
+
+fun initiateAddingPatientStatus(
+    context: Context,
+    heartRate: String,
+    bloodSys: String,
+    bloodDia: String,
+    oxygenLevel: String,
+    onSuccess: () -> Unit
+) {
+    if (heartRate.isNotEmpty() && bloodDia.isNotEmpty() && bloodSys.isNotEmpty() && oxygenLevel.isNotEmpty()) {
+        try {
+            val patientMonitoringInfo = PatientMonitor(
+                heartRate, bloodSys, bloodDia, oxygenLevel,
+                Utils().getCurrentDateTime()
+            )
+            FirestoreManager().uploadPatientMonitoring(
+                patientMonitor = patientMonitoringInfo,
+                onSuccess = {
+                    Toast.makeText(context, "Monitoring data added", Toast.LENGTH_SHORT).show()
+                    onSuccess.invoke()
+                },
+                onFailed = {
+                    Toast.makeText(context, "Failed uploading data", Toast.LENGTH_SHORT).show()
+                }
+            )
+        } catch (e: Exception) {
+            Toast.makeText(context, "Unable to initiate the process", Toast.LENGTH_SHORT).show()
         }
     }
 }
