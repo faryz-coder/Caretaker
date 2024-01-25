@@ -22,15 +22,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bmh.caretaker.model.Notes
+import com.bmh.caretaker.utils.Utils
+import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 
 @Composable
 fun AddMedicalNotesScreen(
     viewModel: MainViewModel
 ) {
+    val context = LocalContext.current
     val openSaveAlertDialog = remember { mutableStateOf(false) }
+    var notes by remember {
+        mutableStateOf("")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,9 +47,6 @@ fun AddMedicalNotesScreen(
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ) {
         Text(text = "Medical Notes")
-        var notes by remember {
-            mutableStateOf("")
-        }
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -65,12 +71,27 @@ fun AddMedicalNotesScreen(
             title = title,
             onConfirmation = {
                 openSaveAlertDialog.value = false
-                viewModel.navController.popBackStack()
+                initiateSavingNotes(notes, title,
+                    onSuccess = {
+                        viewModel.navController.popBackStack()
+                    },
+                    onFailed = {
+                        Utils().showToast(context, "Failed to save notes")
+                        viewModel.navController.popBackStack()
+                    })
             },
             onDismiss = { openSaveAlertDialog.value = false },
             onValueChange = { title = it }
         )
     }
+}
+
+fun initiateSavingNotes(notes: String, title: String, onSuccess: () -> Unit, onFailed: () -> Unit) {
+    val note = Notes(
+        title = title, content = notes,
+        date = Utils().getCurrentDateTime()
+    )
+    FirestoreManager().uploadNotes(note, onSuccess = onSuccess, onFailed = onFailed)
 }
 
 @Preview(showBackground = true)
