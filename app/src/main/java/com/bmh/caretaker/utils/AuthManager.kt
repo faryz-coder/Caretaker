@@ -59,4 +59,11 @@ class AuthManager {
         }
     }
 
+    /**
+     * Logout
+     */
+    fun logout(onSuccess: () -> Unit) {
+        auth.signOut().let { onSuccess.invoke() }
+    }
+
 }

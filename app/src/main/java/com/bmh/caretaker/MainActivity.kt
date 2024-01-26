@@ -1,6 +1,7 @@
 package com.bmh.caretaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -45,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,8 +56,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.bmh.caretaker.navigation.MainNavGraph
+import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.ui.theme.CaretakerTheme
+import com.bmh.caretaker.utils.AuthManager
 import com.bmh.caretaker.utils.SharedPreferenceManager
+import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -97,7 +102,7 @@ fun MainBody(mainViewModel: MainViewModel) {
             ModalDrawerSheet(
                 modifier = Modifier.fillMaxWidth(0.6f)
             ) {
-                DrawerContent()
+                DrawerContent(mainViewModel)
             }
         }
     ) {
@@ -164,7 +169,8 @@ fun MainBody(mainViewModel: MainViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawerContent() {
+fun DrawerContent(mainViewModel: MainViewModel) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -207,7 +213,7 @@ fun DrawerContent() {
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 ElevatedCard(
-                    onClick = {}
+                    onClick = {mainViewModel.navController.navigate(Screen.PatientInformationScreen.route)}
                 ) {
                     Box(
                         modifier = Modifier
@@ -219,7 +225,7 @@ fun DrawerContent() {
                     }
                 }
                 ElevatedCard(
-                    onClick = {}
+                    onClick = {mainViewModel.navController.navigate(Screen.DailyMonitoring.route)}
                 ) {
                     Box(
                         modifier = Modifier
@@ -231,7 +237,7 @@ fun DrawerContent() {
                     }
                 }
                 ElevatedCard(
-                    onClick = {}
+                    onClick = {mainViewModel.navController.navigate(Screen.ReminderScreen.route)}
                 ) {
                     Box(
                         modifier = Modifier
@@ -243,7 +249,7 @@ fun DrawerContent() {
                     }
                 }
                 ElevatedCard(
-                    onClick = {}
+                    onClick = { mainViewModel.navController.navigate(Screen.MedicalNotesScreen.route)}
                 ) {
                     Box(
                         modifier = Modifier
@@ -255,7 +261,7 @@ fun DrawerContent() {
                     }
                 }
                 ElevatedCard(
-                    onClick = {}
+                    onClick = {mainViewModel.navController.navigate(Screen.DietGuideScreen.route)}
                 ) {
                     Box(
                         modifier = Modifier
@@ -267,7 +273,7 @@ fun DrawerContent() {
                     }
                 }
                 ElevatedCard(
-                    onClick = {}
+                    onClick = { mainViewModel.navController.navigate(Screen.GuideAndTipsScreen.route)}
                 ) {
                     Box(
                         modifier = Modifier
@@ -280,7 +286,15 @@ fun DrawerContent() {
                 }
             }
             ElevatedCard(
-                onClick = {}
+                onClick = {
+                    try {
+                        AuthManager().logout {
+                            val intent = Intent(context, LoginActivity::class.java)
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            context.startActivity(intent)
+                        }
+                    } catch (e:Exception){}
+                }
             ) {
                 Box(
                     modifier = Modifier
