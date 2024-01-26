@@ -27,6 +27,7 @@ import com.bmh.caretaker.model.Notes
 import com.bmh.caretaker.model.PatientInfo
 import com.bmh.caretaker.model.PatientMonitor
 import com.bmh.caretaker.model.Reminder
+import com.bmh.caretaker.viewmodel.MainViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.Query
@@ -140,6 +141,25 @@ class FirestoreManager {
     ) {
         db.collection(USERS).document(auth.currentUser?.email.toString()).collection(NOTES)
             .add(notes)
+            .addOnSuccessListener {
+                onSuccess.invoke()
+            }
+            .addOnFailureListener {
+                onFailed.invoke()
+            }
+    }
+
+    /**
+     * Update notes
+     */
+    fun updateNotes(
+        notes: Notes,
+        onSuccess: () -> Unit,
+        onFailed: () -> Unit
+    ) {
+        db.collection(USERS).document(auth.currentUser?.email.toString()).collection(NOTES)
+            .document(notes.id)
+            .set(notes)
             .addOnSuccessListener {
                 onSuccess.invoke()
             }

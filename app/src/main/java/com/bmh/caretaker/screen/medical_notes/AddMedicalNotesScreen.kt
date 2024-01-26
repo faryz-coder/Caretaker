@@ -37,7 +37,7 @@ fun AddMedicalNotesScreen(
     val context = LocalContext.current
     val openSaveAlertDialog = remember { mutableStateOf(false) }
     var notes by remember {
-        mutableStateOf("")
+        mutableStateOf(viewModel.selectedNotes!!.content)
     }
 
     Column(
@@ -59,7 +59,19 @@ fun AddMedicalNotesScreen(
             horizontalArrangement = Arrangement.End
         ) {
             Button(onClick = {
-                openSaveAlertDialog.value = true
+                if (viewModel.selectedNotes != null) {
+                    updateNotes(viewModel, notes,
+                        onSuccess = {
+                            Utils().showToast(context, "Notes updated")
+                            viewModel.navController.popBackStack()
+                        },
+                        onFailed = {
+                            Utils().showToast(context, "Failed to save notes")
+                        }
+                    )
+                } else {
+                    openSaveAlertDialog.value = true
+                }
             }) {
                 Text(text = "Save")
             }
@@ -92,6 +104,13 @@ fun initiateSavingNotes(notes: String, title: String, onSuccess: () -> Unit, onF
         date = Utils().getCurrentDateTime()
     )
     FirestoreManager().uploadNotes(note, onSuccess = onSuccess, onFailed = onFailed)
+}
+
+fun updateNotes(viewModel: MainViewModel, note: String, onSuccess: () -> Unit, onFailed: () -> Unit) {
+    val notes = viewModel.selectedNotes!!
+    notes.content = note
+
+    FirestoreManager().updateNotes(notes, onSuccess = onSuccess, onFailed = onFailed)
 }
 
 @Preview(showBackground = true)

@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.Navigator
 import com.bmh.caretaker.model.Notes
 import com.bmh.caretaker.screen.Screen
 import com.bmh.caretaker.utils.Utils
@@ -84,7 +85,10 @@ fun MedicalNotesScreen(
                     Card(
                         modifier = Modifier
                             .combinedClickable(
-                                onClick = {},
+                                onClick = {
+                                    viewModel.selectedNotes = note
+                                    viewModel.navController.navigate(Screen.AddMedicalNotesScreen.route)
+                                },
                                 onLongClick = {
                                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                     confirmationDialog = true
@@ -121,6 +125,7 @@ fun MedicalNotesScreen(
             horizontalArrangement = Arrangement.End
         ) {
             Button(onClick = {
+                viewModel.selectedNotes = null
                 viewModel.navController.navigate(Screen.AddMedicalNotesScreen.route)
             }) {
                 Text(text = "Add Notes")
