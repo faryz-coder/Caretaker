@@ -17,12 +17,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,6 +67,7 @@ import com.bmh.caretaker.utils.SharedPreferenceManager
 import com.bmh.caretaker.utils.firestore.FirestoreManager
 import com.bmh.caretaker.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
@@ -102,7 +107,7 @@ fun MainBody(mainViewModel: MainViewModel) {
             ModalDrawerSheet(
                 modifier = Modifier.fillMaxWidth(0.6f)
             ) {
-                DrawerContent(mainViewModel)
+                DrawerContent(mainViewModel, { scope.launch { drawerState.close() } })
             }
         }
     ) {
@@ -169,8 +174,13 @@ fun MainBody(mainViewModel: MainViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawerContent(mainViewModel: MainViewModel) {
+fun DrawerContent(mainViewModel: MainViewModel, closeDrawer: () -> Unit) {
     val context = LocalContext.current
+    var email by remember { mutableStateOf("Test@gmail.com") }
+    try {
+        email = AuthManager().auth.currentUser?.email ?: ""
+    } catch (e: Exception) { }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -178,33 +188,48 @@ fun DrawerContent(mainViewModel: MainViewModel) {
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(50.dp),
+            verticalArrangement = Arrangement.spacedBy(30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            Card {
+                Box(
+                    modifier = Modifier.padding(10.dp)
                 ) {
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Title")
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .border(width = 1.dp, color = Color.Black, shape = CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "",
-                            textAlign = TextAlign.Center,
-                            fontSize = 10.sp
-                        )
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = email.replaceFirstChar {
+                                    if (it.isLowerCase()) it.titlecase(
+                                        Locale.ROOT
+                                    ) else it.toString()
+                                }
+                            )
+                        }
+                        Box( Modifier.width(10.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .border(width = 1.dp, color = Color.Black, shape = CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Rounded.Person, contentDescription = "",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "",
+                                textAlign = TextAlign.Center,
+                                fontSize = 10.sp
+                            )
+                        }
                     }
                 }
             }
@@ -213,7 +238,10 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 ElevatedCard(
-                    onClick = {mainViewModel.navController.navigate(Screen.PatientInformationScreen.route)}
+                    onClick = {
+                        mainViewModel.navController.navigate(Screen.PatientInformationScreen.route)
+                        closeDrawer.invoke()
+                    }
                 ) {
                     Box(
                         modifier = Modifier
@@ -225,7 +253,10 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                     }
                 }
                 ElevatedCard(
-                    onClick = {mainViewModel.navController.navigate(Screen.DailyMonitoring.route)}
+                    onClick = {
+                        mainViewModel.navController.navigate(Screen.DailyMonitoring.route)
+                        closeDrawer.invoke()
+                    }
                 ) {
                     Box(
                         modifier = Modifier
@@ -237,7 +268,10 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                     }
                 }
                 ElevatedCard(
-                    onClick = {mainViewModel.navController.navigate(Screen.ReminderScreen.route)}
+                    onClick = {
+                        mainViewModel.navController.navigate(Screen.ReminderScreen.route)
+                        closeDrawer.invoke()
+                    }
                 ) {
                     Box(
                         modifier = Modifier
@@ -249,7 +283,10 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                     }
                 }
                 ElevatedCard(
-                    onClick = { mainViewModel.navController.navigate(Screen.MedicalNotesScreen.route)}
+                    onClick = {
+                        mainViewModel.navController.navigate(Screen.MedicalNotesScreen.route)
+                        closeDrawer.invoke()
+                    }
                 ) {
                     Box(
                         modifier = Modifier
@@ -261,7 +298,10 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                     }
                 }
                 ElevatedCard(
-                    onClick = {mainViewModel.navController.navigate(Screen.DietGuideScreen.route)}
+                    onClick = {
+                        mainViewModel.navController.navigate(Screen.DietGuideScreen.route)
+                        closeDrawer.invoke()
+                    }
                 ) {
                     Box(
                         modifier = Modifier
@@ -273,7 +313,10 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                     }
                 }
                 ElevatedCard(
-                    onClick = { mainViewModel.navController.navigate(Screen.GuideAndTipsScreen.route)}
+                    onClick = {
+                        mainViewModel.navController.navigate(Screen.GuideAndTipsScreen.route)
+                        closeDrawer.invoke()
+                    }
                 ) {
                     Box(
                         modifier = Modifier
@@ -293,7 +336,8 @@ fun DrawerContent(mainViewModel: MainViewModel) {
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                             context.startActivity(intent)
                         }
-                    } catch (e:Exception){}
+                    } catch (e: Exception) {
+                    }
                 }
             ) {
                 Box(

@@ -177,6 +177,14 @@ class FirestoreManager {
     }
 
     /**
+     * Remove notes
+     */
+    fun removeNotes(notes: Notes) {
+        db.collection(USERS).document(auth.currentUser?.email.toString()).collection(NOTES)
+            .document(notes.id).delete()
+    }
+
+    /**
      * Upload reminder
      */
     fun uploadReminder(
