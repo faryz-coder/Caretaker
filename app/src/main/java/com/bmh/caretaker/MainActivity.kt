@@ -1,10 +1,18 @@
 package com.bmh.caretaker
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -56,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -73,18 +82,72 @@ class MainActivity : ComponentActivity() {
     private lateinit var navHostController: NavHostController
     private lateinit var mainViewModel: MainViewModel
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+
         val sharedPref =
             this.getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE)
         mainViewModel.sharedPreferenceManager = SharedPreferenceManager(sharePref = sharedPref)
+        checkPermission(mainViewModel)
+
         setContent {
             CaretakerTheme {
                 navHostController = rememberNavController()
                 mainViewModel.navController = navHostController
 
                 MainBody(mainViewModel)
+            }
+        }
+    }
+
+    /**
+     * Initialize Notification Channel
+     */
+    private fun initNotificationChannel() {
+        val channelId = this.getString(R.string.app_name)
+        val channelName = this.getString(R.string.app_name)
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(channelId, channelName, importance).apply {
+            description = "notification"
+        }
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    /**
+     * Check permission
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun checkPermission(mainViewModel: MainViewModel) {
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            mainViewModel.isPermissionGranted = isGranted
+            if (isGranted) {
+                Log.i("Permission: ", "Granted")
+                initNotificationChannel()
+            } else {
+                Log.i("Permission: ", "Denied")
+            }
+        }
+
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) -> {
+                Log.i("Permission: ", "Granted")
+                mainViewModel.isPermissionGranted = true
+                initNotificationChannel()
+            }
+
+            else -> {
+                mainViewModel.isPermissionGranted = false
+                requestPermissionLauncher.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
             }
         }
     }

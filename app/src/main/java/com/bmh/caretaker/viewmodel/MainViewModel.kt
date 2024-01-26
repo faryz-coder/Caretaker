@@ -9,5 +9,7 @@ class MainViewModel: ViewModel() {
     lateinit var navController: NavHostController
     lateinit var sharedPreferenceManager: SharedPreferenceManager
 
+    var isPermissionGranted = false
+
     var selectedNotes: Notes? = null
 }
