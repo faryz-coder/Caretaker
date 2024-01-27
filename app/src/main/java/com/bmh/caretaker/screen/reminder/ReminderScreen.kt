@@ -2,6 +2,7 @@ package com.bmh.caretaker.screen.reminder
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNotifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.broadcast.NotificationManager
 import com.bmh.caretaker.model.Reminder
 import com.bmh.caretaker.screen.medical_notes.ConfirmationDialog
+import com.bmh.caretaker.utils.Utils
 import com.bmh.caretaker.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -83,6 +86,11 @@ fun ReminderScreen(
                 ReminderBox(viewModel, item,
                     onChange = {
                         viewModel.sharedPreferenceManager.updateReminderStatus(item, it)
+                        reminders.map { itm ->
+                            if (itm == item) {
+                                itm.checked = it
+                            }
+                        }
                         if (it) {
                             NotificationManager().createNotification(
                                 context = context,
@@ -125,6 +133,7 @@ fun DialogAddReminder(
     onDismissRequest: () -> Unit = {},
     onConfirmation: (String, String) -> Unit = { _, _ -> },
 ) {
+    val context = LocalContext.current
     val state = rememberTimePickerState()
     val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
     val snackScope = rememberCoroutineScope()
@@ -150,14 +159,18 @@ fun DialogAddReminder(
                 cal.set(Calendar.MINUTE, state.minute)
                 cal.isLenient = false
                 Log.d("ReminderScreen", "$cal")
-                viewModel.sharedPreferenceManager.addReminderInto(
-                    Reminder(
-                        hour = state.hour,
-                        minute = state.minute,
-                        label = label
+                if (label.isNotEmpty()) {
+                    viewModel.sharedPreferenceManager.addReminderInto(
+                        Reminder(
+                            hour = state.hour,
+                            minute = state.minute,
+                            label = label
+                        )
                     )
-                )
-                onDismissRequest.invoke()
+                    onDismissRequest.invoke()
+                } else {
+                    Utils().showToast(context = context, "Missing Label")
+                }
             }) {
                 Text(text = "Confirm")
             }
@@ -203,15 +216,17 @@ fun ReminderBox(
     }
     ElevatedCard(
         modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {},
-                onLongClick = {
-                    confirmationDialog = true
-                }
-            )
+            .fillMaxWidth(),
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        confirmationDialog = true
+                    }
+                )
+        ) {
             Column(
                 modifier = Modifier
                     .padding(10.dp),
@@ -229,7 +244,7 @@ fun ReminderBox(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "${reminder.hour}:${if (reminder.minute < 10) 0 else ""}${reminder.minute}"
+                                text = Utils().convertTo12h(reminder.hour, reminder.minute)[0]
                             )
                         }
 
@@ -237,7 +252,7 @@ fun ReminderBox(
                             modifier = Modifier.fillMaxWidth(1f),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "AM/PM")
+                            Text(text = Utils().convertTo12h(reminder.hour, reminder.minute)[1])
                         }
                     }
                 }

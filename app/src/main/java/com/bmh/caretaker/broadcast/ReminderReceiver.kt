@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.bmh.caretaker.R
@@ -20,8 +21,10 @@ class ReminderReceiver : BroadcastReceiver() {
         val message = intent?.getStringExtra(MESSAGE)
         val hour = intent?.getIntExtra(HOUR, 0)
         val minute = intent?.getIntExtra(MESSAGE, 0)
+        Log.d("MainViewModel", "onReceive")
 
         if (notificationId != null && message != null && requestCode != null) {
+            Log.d("MainViewModel", "onReceive2")
 
             var builder = NotificationCompat.Builder(context, context.getString(R.string.app_name))
                 .setSmallIcon(R.drawable.app_logo)

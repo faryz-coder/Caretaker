@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.R
 import com.bmh.caretaker.model.Reminder
 import com.bmh.caretaker.screen.Screen
+import com.bmh.caretaker.utils.Utils
 import com.bmh.caretaker.viewmodel.MainViewModel
 import java.time.LocalTime
 
@@ -222,16 +223,14 @@ fun HomeScreen(
                                                     modifier = Modifier.fillMaxWidth(0.5f),
                                                     contentAlignment = Alignment.Center
                                                 ) {
-                                                    Text(
-                                                        text = "${item.hour}:${if (item.minute < 10) 0 else ""}${item.minute}"
-                                                    )
+                                                    Text(text = Utils().convertTo12h(item.hour, item.minute)[0])
                                                 }
 
                                                 Box(
                                                     modifier = Modifier.fillMaxWidth(1f),
                                                     contentAlignment = Alignment.Center
                                                 ) {
-                                                    Text(text = "AM/PM")
+                                                    Text(text = Utils().convertTo12h(item.hour, item.minute)[1])
                                                 }
                                             }
                                         }
@@ -267,7 +266,7 @@ fun filterData(reminders: MutableList<Reminder>): MutableList<Reminder> {
 
     val filteredData = mutableListOf<Reminder>()
     reminders.map {
-        if (it.hour < currentHour && it.minute < currentMinute) {
+        if (it.hour >= currentHour && it.minute >= currentMinute) {
             filteredData.add(it)
         }
     }

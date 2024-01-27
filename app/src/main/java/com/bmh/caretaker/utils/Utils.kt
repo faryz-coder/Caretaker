@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class Utils {
@@ -48,5 +49,22 @@ class Utils {
      */
     fun showToast(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * Convert to 12h
+     */
+    fun convertTo12h(hour: Int = 0, minute: Int = 0): List<String> {
+        val time24h = "$hour:$minute"
+
+        val localTime = LocalTime.parse(time24h, DateTimeFormatter.ofPattern("H:m"))
+
+        // Define a custom formatter with AM/PM
+        val formatter = DateTimeFormatter.ofPattern("h:mm a")
+
+        // Format the LocalTime object with the formatter
+        val formattedTime = localTime.format(formatter)
+
+        return formattedTime.split(" ")
     }
 }
