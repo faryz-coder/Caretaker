@@ -2,6 +2,7 @@ package com.bmh.caretaker.screen.daily_monitoring
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,10 +17,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -99,9 +102,7 @@ fun DailyMonitoringScreen(
                 Utils().showToast(context, "Failed retrieving data")
             }
         )
-    } catch (e: Exception) {
-        Utils().showToast(context, "Failed to connect to db")
-    }
+    } catch (e: Exception) { }
 
     Column(
         modifier = Modifier
@@ -127,6 +128,16 @@ fun DailyMonitoringScreen(
                         contentScale = ContentScale.FillWidth,
                         modifier = Modifier.fillMaxSize(),
                     )
+                }
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                IconButton(onClick = {
+                    viewModel.navController.navigate(Screen.HistoryScreen.route)
+                }) {
+                    Icon(imageVector = Icons.Rounded.History, contentDescription = "History Button")
                 }
             }
         }
