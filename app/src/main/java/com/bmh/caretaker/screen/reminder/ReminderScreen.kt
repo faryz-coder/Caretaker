@@ -1,9 +1,14 @@
 package com.bmh.caretaker.screen.reminder
 
 import android.util.Log
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNotifications
 import androidx.compose.material3.AlertDialog
@@ -31,6 +38,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +47,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.broadcast.NotificationManager
@@ -100,7 +118,10 @@ fun ReminderScreen(
                                 minute = item.minute
                             )
                         } else {
-                            NotificationManager().removeNotification(context, reminders.indexOf(item))
+                            NotificationManager().removeNotification(
+                                context,
+                                reminders.indexOf(item)
+                            )
                         }
                     },
                     reminders.indexOf(item),
@@ -141,6 +162,11 @@ fun DialogAddReminder(
     val snackScope = rememberCoroutineScope()
     val snackState = remember { SnackbarHostState() }
     var label by remember { mutableStateOf("") }
+    var focusRequester = remember {
+        FocusRequester()
+    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var focusManager = LocalFocusManager.current
 
     AlertDialog(
         icon = { Icon(Icons.Rounded.EditNotifications, contentDescription = "Reminder") },
@@ -149,12 +175,28 @@ fun DialogAddReminder(
             Column {
                 TimePicker(state = state)
                 OutlinedTextField(
+                    modifier = Modifier
+                        .onFocusChanged {
+                            if (it.isFocused) {
+                                Log.d("Reminder", "isFocused")
+                            } else {
+                                Log.d("Reminder", "isFocused!!")
+
+                            }
+                        },
                     label = { Text(text = "Reminder Label") },
-                    value = label, onValueChange = { label = it })
+                    value = label, onValueChange = { label = it },
+                    keyboardActions = KeyboardActions(onDone = {
+                        Log.d("Reminder", "onDone")
+                        focusManager.clearFocus()
+                    }),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+                )
             }
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
+            focusManager = LocalFocusManager.current
             TextButton(onClick = {
                 val cal = Calendar.getInstance()
                 cal.set(Calendar.HOUR_OF_DAY, state.hour)
