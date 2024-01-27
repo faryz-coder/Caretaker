@@ -99,6 +99,8 @@ fun ReminderScreen(
                                 hour = item.hour,
                                 minute = item.minute
                             )
+                        } else {
+                            NotificationManager().removeNotification(context, reminders.indexOf(item))
                         }
                     },
                     reminders.indexOf(item),

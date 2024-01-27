@@ -29,12 +29,14 @@ class NotificationManager {
         )
 
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.HOUR_OF_DAY, hour)
-        calendar.add(Calendar.MINUTE, minute)
-        calendar.add(Calendar.SECOND, 0)
+        calendar.set(Calendar.HOUR_OF_DAY, hour)
+        calendar.set(Calendar.MINUTE, minute)
+        calendar.set(Calendar.SECOND, 0)
 
-        // Subtract 30 days
-        calendar.add(Calendar.DAY_OF_MONTH, -30)
+        if (calendar.timeInMillis <= System.currentTimeMillis()) {
+            // If yes, set it for tomorrow
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
 
         alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
@@ -53,6 +55,8 @@ class NotificationManager {
         )
 
         // Cancel the alarm
-        alarmManager.cancel(pendingIntent)
+        alarmManager.cancel(pendingIntent).let {
+            Log.d("MainViewModel", "Notification removed")
+        }
     }
 }
