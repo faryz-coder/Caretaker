@@ -37,7 +37,7 @@ fun AddMedicalNotesScreen(
     val context = LocalContext.current
     val openSaveAlertDialog = remember { mutableStateOf(false) }
     var notes by remember {
-        mutableStateOf(viewModel.selectedNotes!!.content)
+        mutableStateOf(viewModel.selectedNotes?.content ?: "")
     }
 
     Column(
