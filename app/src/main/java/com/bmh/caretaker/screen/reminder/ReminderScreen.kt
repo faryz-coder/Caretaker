@@ -93,7 +93,9 @@ fun ReminderScreen(
                             )
                         }
                     },
-                    reminders.indexOf(item))
+                    reminders.indexOf(item),
+                    onDeletion = { reminders.remove(item) }
+                )
             }
         }
         ElevatedButton(
@@ -171,7 +173,13 @@ fun DialogAddReminder(
 @OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun ReminderBox(viewModel: MainViewModel = MainViewModel(), reminder: Reminder = Reminder(), onChange: (Boolean) -> Unit = {}, index: Int = 0) {
+fun ReminderBox(
+    viewModel: MainViewModel = MainViewModel(),
+    reminder: Reminder = Reminder(),
+    onChange: (Boolean) -> Unit = {},
+    index: Int = 0,
+    onDeletion: () -> Unit = {}
+) {
     val context = LocalContext.current
     var currentState by remember {
         mutableStateOf(reminder.checked)
@@ -187,6 +195,8 @@ fun ReminderBox(viewModel: MainViewModel = MainViewModel(), reminder: Reminder =
                     /* Remove notification if it currently enabled */
                     NotificationManager().removeNotification(context, index)
                 }
+                confirmationDialog = false
+                onDeletion.invoke()
             },
             onDismissRequest = { confirmationDialog = false }
         )

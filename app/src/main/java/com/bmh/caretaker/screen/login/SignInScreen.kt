@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,7 +64,10 @@ fun SignInScreen(
     ) {
         Card(
             modifier = Modifier
-                .size(200.dp, 200.dp)
+                .size(200.dp, 200.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black
+            )
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
