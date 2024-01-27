@@ -35,8 +35,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.bmh.caretaker.broadcast.NotificationManager
 import com.bmh.caretaker.model.Reminder
 import com.bmh.caretaker.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
@@ -47,6 +49,7 @@ import java.util.Locale
 fun ReminderScreen(
     viewModel: MainViewModel
 ) {
+    val context = LocalContext.current
     val addAlertDialog = remember { mutableStateOf(false) }
 
     Column(
@@ -77,6 +80,15 @@ fun ReminderScreen(
                 ReminderBox(item,
                     onChange = {
                         viewModel.sharedPreferenceManager.updateReminderStatus(item, it)
+                        if (it) {
+                            NotificationManager().createNotification(
+                                context = context,
+                                requestCode = reminders.indexOf(item),
+                                label = item.label,
+                                hour = item.hour,
+                                minute = item.minute
+                            )
+                        }
                     })
             }
         }
