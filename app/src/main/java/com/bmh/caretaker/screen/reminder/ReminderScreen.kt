@@ -1,6 +1,8 @@
 package com.bmh.caretaker.screen.reminder
 
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bmh.caretaker.broadcast.NotificationManager
 import com.bmh.caretaker.model.Reminder
+import com.bmh.caretaker.screen.medical_notes.ConfirmationDialog
 import com.bmh.caretaker.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -77,7 +80,7 @@ fun ReminderScreen(
             items(
                 reminders
             ) { item ->
-                ReminderBox(item,
+                ReminderBox(viewModel, item,
                     onChange = {
                         viewModel.sharedPreferenceManager.updateReminderStatus(item, it)
                         if (it) {
@@ -89,7 +92,8 @@ fun ReminderScreen(
                                 minute = item.minute
                             )
                         }
-                    })
+                    },
+                    reminders.indexOf(item))
             }
         }
         ElevatedButton(
@@ -164,14 +168,38 @@ fun DialogAddReminder(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
-fun ReminderBox(reminder: Reminder = Reminder(), onChange: (Boolean) -> Unit = {}) {
+fun ReminderBox(viewModel: MainViewModel = MainViewModel(), reminder: Reminder = Reminder(), onChange: (Boolean) -> Unit = {}, index: Int = 0) {
+    val context = LocalContext.current
     var currentState by remember {
         mutableStateOf(reminder.checked)
     }
+    var confirmationDialog by remember {
+        mutableStateOf(false)
+    }
+    if (confirmationDialog) {
+        ConfirmationDialog(
+            onConfirm = {
+                viewModel.sharedPreferenceManager.removeItem(reminder.id)
+                if (reminder.checked) {
+                    /* Remove notification if it currently enabled */
+                    NotificationManager().removeNotification(context, index)
+                }
+            },
+            onDismissRequest = { confirmationDialog = false }
+        )
+    }
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = {},
+                onLongClick = {
+                    confirmationDialog = true
+                }
+            )
     ) {
         Box {
             Column(
