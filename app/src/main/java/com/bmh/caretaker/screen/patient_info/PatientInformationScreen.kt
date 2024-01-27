@@ -67,6 +67,10 @@ fun PatientInformationScreen(
         mutableStateOf(null)
     }
 
+    var savedPatientInfo by remember {
+        mutableStateOf(false)
+    }
+
     val painter = rememberAsyncImagePainter(model = updateImg)
 
     val pickImage = rememberLauncherForActivityResult(
@@ -94,33 +98,40 @@ fun PatientInformationScreen(
     var cancerStage by rememberSaveable {
         mutableStateOf("")
     }
+    var savedImage by rememberSaveable {
+        mutableStateOf("")
+    }
     var base64Image: ByteArray? = null
     var bitmap: Bitmap? by rememberSaveable {
         mutableStateOf(null)
     }
+    if (!savedPatientInfo) {
+        try {
+            FirestoreManager().getPatientInfo(
+                onSuccess = {
+                    name = it.name
+                    age = it.age
+                    gender = it.gender
+                    birthDate = it.dateOfBirth
+                    cancerType = it.cancerType
+                    cancerStage = it.cancerStage
+                    base64Image = Utils().imageFromBase64(it.image)
+                    savedImage = it.image
 
-    try {
-        FirestoreManager().getPatientInfo(
-            onSuccess = {
-                name = it.name
-                age = it.age
-                gender = it.gender
-                birthDate = it.dateOfBirth
-                cancerType = it.cancerType
-                cancerStage = it.cancerStage
-                base64Image = Utils().imageFromBase64(it.image)
-
-                bitmap = base64Image?.let { byteArray ->
-                    BitmapFactory.decodeByteArray(
-                        base64Image,
-                        0,
-                        byteArray.size
-                    )
-                }
-            },
-            onFailed = {}
-        )
-    } catch (_: Exception) {
+                    bitmap = base64Image?.let { byteArray ->
+                        BitmapFactory.decodeByteArray(
+                            base64Image,
+                            0,
+                            byteArray.size
+                        )
+                    }
+                    savedPatientInfo = true
+                },
+                onFailed = {}
+            )
+        } catch (_: Exception) {
+            savedPatientInfo = true
+        }
     }
 
 
@@ -203,7 +214,15 @@ fun PatientInformationScreen(
                     "name: $name, age: $age, gender: $gender, dob: $birthDate, ctype: $cancerType, cStage: $cancerStage"
                 )
                 initiatePatientInfoUpdate(
-                    context, name, age, gender, birthDate, cancerType, cancerStage, updateImg
+                    context,
+                    name,
+                    age,
+                    gender,
+                    birthDate,
+                    cancerType,
+                    cancerStage,
+                    updateImg,
+                    savedImage
                 )
 
             }) {
@@ -220,23 +239,31 @@ fun initiatePatientInfoUpdate(
     birthDate: String,
     cancerType: String,
     cancerStage: String,
-    updateImg: Uri?
+    updateImg: Uri?,
+    savedImage: String
 ) {
     if (name.isNotEmpty() && age.isNotEmpty() && gender.isNotEmpty() && birthDate.isNotEmpty() && cancerType.isNotEmpty()
-        && cancerStage.isNotEmpty() && updateImg != null
+        && cancerStage.isNotEmpty()
     ) {
-        val stringBase64 = Utils().convertImageToBase64(context, updateImg) ?: ""
-        PatientInfo(
-            name, age, gender, birthDate, cancerType, cancerStage, stringBase64
-        ).let {
-            try {
-                FirestoreManager().uploadPatientInfo(
-                    patientInfo = it,
-                    onSuccess = { Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show() },
-                    onFailed = {}
-                )
-            } catch (e: Exception) {
-                Log.e("PatientInfo", "initiatePatientInfoUpdate:Error:$e")
+
+        val stringBase64 =
+            if (savedImage.isNotEmpty() && updateImg == null) savedImage else if (updateImg != null) Utils().convertImageToBase64(
+                context,
+                updateImg
+            ) else ""
+        if (stringBase64 != null) {
+            PatientInfo(
+                name, age, gender, birthDate, cancerType, cancerStage, stringBase64
+            ).let {
+                try {
+                    FirestoreManager().uploadPatientInfo(
+                        patientInfo = it,
+                        onSuccess = { Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show() },
+                        onFailed = {}
+                    )
+                } catch (e: Exception) {
+                    Log.e("PatientInfo", "initiatePatientInfoUpdate:Error:$e")
+                }
             }
         }
     }
