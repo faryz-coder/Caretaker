@@ -92,11 +92,13 @@ fun DailyMonitoringScreen(
 
         FirestoreManager().getListOfPatientMonitoring(
             onSuccess = {
-                val info = it.first()
-                heartBeatProgress = info.heartRate
-                sysProgress = info.bloodSys
-                diaProgress = info.bloodDia
-                oxygenLevelProgress = info.oxygenLevel
+                if (it.size > 0) {
+                    val info = it.first()
+                    heartBeatProgress = info.heartRate
+                    sysProgress = info.bloodSys
+                    diaProgress = info.bloodDia
+                    oxygenLevelProgress = info.oxygenLevel
+                }
             },
             onFailed = {
                 Utils().showToast(context, "Failed retrieving data")
