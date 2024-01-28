@@ -57,195 +57,146 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.weight(0.4f)
+//            modifier = Modifier.weight(0.7f)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Row(
-                    modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    ElevatedCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = {
-                            viewModel.navController.navigate(Screen.PatientInformationScreen.route)
-                        },
+                    Box(
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.patient_info),
-                                contentDescription = ""
-                            )
-//                            Text(text = "Patient Information", textAlign = TextAlign.Center)
-                        }
+                        HomeItem(
+                            label = "Patient Information",
+                            onClick = {
+                                viewModel.navController.navigate(Screen.PatientInformationScreen.route)
+                            }, R.drawable.patient_info
+                        )
                     }
-                    ElevatedCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = { viewModel.navController.navigate(Screen.DailyMonitoring.route) },
+                    Box(
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.daily_monitoring),
-                                contentDescription = ""
-                            )
-//                            Text(text = "Daily Monitoring")
-                        }
+                        HomeItem(
+                            label = "Daily Monitoring",
+                            onClick = { viewModel.navController.navigate(Screen.DailyMonitoring.route) },
+                            R.drawable.daily_monitoring
+                        )
                     }
-                    ElevatedCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = {
-                            viewModel.navController.navigate(Screen.ReminderScreen.route)
-                        },
+                    Box(
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.reminder),
-                                contentDescription = ""
-                            )
-//                            Text(text = "Reminder", textAlign = TextAlign.Center)
-                        }
+                        HomeItem(
+                            label = "Reminder",
+                            onClick = { viewModel.navController.navigate(Screen.ReminderScreen.route) },
+                            R.drawable.reminder
+                        )
                     }
                 }
                 Row(
-                    modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    ElevatedCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = {
-                            viewModel.navController.navigate(Screen.MedicalNotesScreen.route)
-                        },
+                    Box(
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.medical_notes),
-                                contentDescription = ""
-                            )
-//                            Text(text = "Medical Notes", textAlign = TextAlign.Center)
-                        }
+                        HomeItem(
+                            label = "Medical Notes",
+                            onClick = { viewModel.navController.navigate(Screen.MedicalNotesScreen.route) },
+                            R.drawable.medical_notes
+                        )
                     }
-                    ElevatedCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = {
-                            viewModel.navController.navigate(Screen.DietGuideScreen.route)
-                        },
+                    Box(
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.diet),
-                                contentDescription = ""
-                            )
-//                            Text(text = "Diet Guides", textAlign = TextAlign.Center)
-                        }
+                        HomeItem(
+                            label = "Diet Guide",
+                            onClick = { viewModel.navController.navigate(Screen.DietGuideScreen.route) },
+                            R.drawable.diet
+                        )
                     }
-                    ElevatedCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = {
-                            viewModel.navController.navigate(Screen.GuideAndTipsScreen.route)
-                        },
+                    Box(
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.guide),
-                                contentDescription = ""
-                            )
-//                            Text(text = "Guide & Tips", textAlign = TextAlign.Center)
-                        }
+                        HomeItem(
+                            label = "Guide and Tips",
+                            onClick = { viewModel.navController.navigate(Screen.GuideAndTipsScreen.route) },
+                            R.drawable.guide
+                        )
                     }
                 }
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(top = 20.dp)
-        ) {
-            Card(
-                modifier = Modifier.fillMaxSize()
-            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp),
+                        .weight(1f)
                 ) {
-                    Text(text = "Reminder List")
-                    LazyColumn {
-                        items(filterData(reminders)) {item ->
-                            ElevatedCard(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                Box {
-                                    Column(
+                    Card(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(20.dp),
+                        ) {
+                            Text(text = "Reminder List")
+                            LazyColumn {
+                                items(filterData(reminders)) { item ->
+                                    ElevatedCard(
                                         modifier = Modifier
-                                            .padding(10.dp),
-                                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                                            .fillMaxWidth()
                                     ) {
-                                        Card {
-                                            Row(
+                                        Box {
+                                            Column(
                                                 modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(20.dp),
-                                                verticalAlignment = Alignment.CenterVertically
+                                                    .padding(10.dp),
+                                                verticalArrangement = Arrangement.spacedBy(20.dp)
                                             ) {
-                                                Box(
-                                                    modifier = Modifier.fillMaxWidth(0.5f),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Text(text = Utils().convertTo12h(item.hour, item.minute)[0])
-                                                }
+                                                Card {
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(20.dp),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Box(
+                                                            modifier = Modifier.fillMaxWidth(0.5f),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Text(
+                                                                text = Utils().convertTo12h(
+                                                                    item.hour,
+                                                                    item.minute
+                                                                )[0]
+                                                            )
+                                                        }
 
-                                                Box(
-                                                    modifier = Modifier.fillMaxWidth(1f),
-                                                    contentAlignment = Alignment.Center
+                                                        Box(
+                                                            modifier = Modifier.fillMaxWidth(1f),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Text(
+                                                                text = Utils().convertTo12h(
+                                                                    item.hour,
+                                                                    item.minute
+                                                                )[1]
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.Bottom
                                                 ) {
-                                                    Text(text = Utils().convertTo12h(item.hour, item.minute)[1])
+                                                    TextField(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        value = item.label,
+                                                        onValueChange = {},
+                                                        readOnly = true,
+                                                        label = { Text(text = "Label") }
+                                                    )
                                                 }
                                             }
-                                        }
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.Bottom
-                                        ) {
-                                            TextField(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                value = item.label, onValueChange = {}, readOnly = true,
-                                                label = { Text(text = "Label") }
-                                            )
                                         }
                                     }
                                 }
@@ -255,6 +206,33 @@ fun HomeScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun HomeItem(
+    label: String = "Patient Information",
+    onClick: () -> Unit = {},
+    icon: Int = R.drawable.patient_info
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ElevatedCard(
+            onClick = onClick,
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = icon),
+                    contentDescription = ""
+                )
+            }
+        }
+        Text(text = label, textAlign = TextAlign.Center)
     }
 }
 
@@ -274,7 +252,6 @@ fun filterData(reminders: MutableList<Reminder>): MutableList<Reminder> {
     }
     return filteredData
 }
-
 
 
 @Preview(showBackground = true)
