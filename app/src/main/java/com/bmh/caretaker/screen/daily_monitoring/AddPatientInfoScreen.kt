@@ -84,8 +84,8 @@ fun AddPatientInfoScreen(
                     progress2 = bloodDia,
                     onValueChange1 = { bloodSys = it },
                     onValueChange2 = { bloodDia = it },
-                    type1 = "BPM",
-                    type2 = "BPM"
+                    type1 = "SYS",
+                    type2 = "DIA"
                 )
                 Text(text = "Blood Pressure")
             }
